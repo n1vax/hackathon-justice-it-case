@@ -1,25 +1,40 @@
-
-import Card from '@mui/material/Card';
+import { Box } from '@mui/system'
 import React, { ReactNode } from 'react'
 import { grey } from '@mui/material/colors';
+import { BoxProps, Paper } from '@mui/material';
+import { styled } from '@mui/system';
 
 
 interface PanelProps {
-  children: ReactNode
+  children: ReactNode;
+  expanded?: boolean;
 }
 
-const Panel = ({ children }: PanelProps) => {
+const Panel = ({ children, expanded }: PanelProps) => {
   return (
-    <Card
-      height="100%"
-      width="100%"
+    // <Paper
+    //   className="panel"
+    //   sx={{
+    //     width: { xl: expanded ? "100%" : "100px" },
+    //     height: { xs: expanded ? "80vh" : "100px", xl: "auto" },
+    //     borderRadius: 5,
+    //     overflow: "hidden",
+    //   }}
+    // >
+    //   {children}
+    // </Paper>
+    <Box
+      className="panel"
+      width={{ xl: expanded ? "100%" : "100px" }}
+      height={{ xs: expanded ? "80vh" : "100px", xl: "auto" }}
       borderRadius={5}
-    // overflow="hidden"
-    // elevation={4}
-    // bgcolor={grey[200]}
+      overflow="hidden"
+      bgcolor={grey[100]}
     >
+      {/* <Paper height="100%" elevation={10}> */}
       {children}
-    </Card>
+      {/* </Paper> */}
+    </Box>
   )
 }
 

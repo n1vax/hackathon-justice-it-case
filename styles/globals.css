@@ -6,38 +6,8 @@
   box-sizing: border-box;
 }
 
-.app {
-  position: relative;
-  height: 100vh;
-  padding: 50px;
-  background-color: #f9f9fb;
-}
-
-.map {
-  position: relative;
-  /* position: absolute;
-  top: 0;
-  left: 0; */
-  width: 100%;
-  height: 100%;
-}
-
-.map__content {
-  height: 100%;
-}
-
 .panel {
   width: 100%;
-  height: 100%;
-  border-radius: 20px;
-  overflow: hidden;
-  background-color: #eeeef0;
-  box-shadow: 0 16px 16px -8px rgb(73 73 101 / 5%);
-}
-
-.ui {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
+  transition: all 0.4s;
+  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.1);
 }

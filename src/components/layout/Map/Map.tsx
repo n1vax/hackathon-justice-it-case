@@ -1,145 +1,172 @@
 import GoogleMap from "google-map-react"
 // import { GoogleMap, withGoogleMap } from "react-google-maps";
-import { useEffect, useState } from "react";
-import { Mesh, Scene, BoxBufferGeometry, MeshNormalMaterial } from "three";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { Mesh, Scene, BoxBufferGeometry, MeshNormalMaterial, Vector2 } from "three";
 import { latLngToVector3, ThreeJSOverlayView } from "@googlemaps/three";
-import { GOOGLE_API_KEY } from "@utils/config";
+import { useGoogle } from "src/contexts/Google";
+import { GOOGLE_API_KEY } from '@utils/config';
+import { Loader } from '@googlemaps/js-api-loader';
+import Button from '@mui/material/Button';
+import { latLngToVector2Relative, latLngToVector3Relative } from "@utils/three";
+import { Backdrop, TextField } from "@mui/material";
+import { Box } from "@mui/system";
+import { useForm } from "react-hook-form";
+
 
 
 interface MapProps {
-  position: GoogleMap.Coords;
+  children?: ReactNode;
+  center: GoogleMap.Coords;
   zoom?: number;
+  onChange: (data: { area: number, path: Vector2[] } | null) => void;
 }
-
-const Marker = ({ lat, lng }: GoogleMap.Coords) => {
-  return <button>
-    marker
-  </button>
-}
-
 
 const Map = ({
-  position,
-  zoom = 18
+  center,
+  onChange,
+  children
 }: MapProps) => {
-  const [google, setGoogle] = useState<{ map: any, maps: any }>();
-
-  const handleGoogleApiLoaded = (params: { map: any, maps: any }) => {
-    const polyOptions = {
-      strokeWeight: 0,
-      fillOpacity: 0.45,
-      editable: true
-    };
-    // Creates a drawing manager attached to the map that allows the user to draw
-    // markers, lines, and shapes.
-    const drawingManager = params.maps.drawing.DrawingManager({
-      drawingMode: params.maps.drawing.OverlayType.POLYGON,
-      markerOptions: {
-        draggable: true
-      },
-      polylineOptions: {
-        editable: true
-      },
-      rectangleOptions: polyOptions,
-      circleOptions: polyOptions,
-      polygonOptions: polyOptions,
-      map: params.map
-    });
-
-    // const triangleCoords = [
-    //   { lat: 25.774, lng: -80.19 },
-    //   { lat: 18.466, lng: -66.118 },
-    //   { lat: 32.321, lng: -64.757 },
-    //   { lat: 25.774, lng: -80.19 }
-    // ];
-
-    // var bermudaTriangle = new params.maps.Polygon({
-    //   paths: triangleCoords,
-    //   strokeColor: "#FF0000",
-    //   strokeOpacity: 0.8,
-    //   strokeWeight: 2,
-    //   fillColor: "#FF0000",
-    //   fillOpacity: 0.35
-    // });
-    // bermudaTriangle.setMap(params.map);
-
-    setGoogle(params);
-  }
+  const elRef = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<{
+    google?: typeof window.google,
+    map?: google.maps.Map,
+    drawingManager?: google.maps.drawing.DrawingManager,
+    selectedShape?: google.maps.Polygon
+  }>({});
 
   useEffect(() => {
-    // if (map) {
-    //   map.setOptions({
-    //     zoom
-    //   })
-    // }
-    // setZoom(20);
-  }, [position]);
+    const loader = new Loader({
+      apiKey: GOOGLE_API_KEY,
+      version: 'weekly',
+      libraries: ["drawing"]
+    });
+    const el = elRef.current!;
 
-  // useEffect(() => {
-  //   if (!google) {
-  //     return;
-  //   }
+    loader.load().then((google) => {
+      const map = new google.maps.Map(el, {
+        center: { lat: -34.397, lng: 150.644 },
+        zoom: 20,
+        disableDefaultUI: true,
+        mapTypeId: "satellite"
+      });
 
-  //   const drawingManager = google.maps.drawing.DrawingManager({
-  //     drawingMode: google.maps.drawing.OverlayType.POLYGON,
-  //     markerOptions: {
-  //       draggable: true
-  //     },
-  //     polylineOptions: {
-  //       editable: true
-  //     },
-  //     drawingControlOptions: {
-  //       position: google.maps.ControlPosition.TOP_CENTER,
-  //       drawingModes: [
-  //         google.maps.drawing.OverlayType.MARKER,
-  //         google.maps.drawing.OverlayType.CIRCLE,
-  //         google.maps.drawing.OverlayType.POLYGON,
-  //         google.maps.drawing.OverlayType.POLYLINE,
-  //         google.maps.drawing.OverlayType.RECTANGLE,
-  //       ],
-  //     },
-  //     // markerOptions: {
-  //     //   icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
-  //     // },
-  //     circleOptions: {
-  //       fillColor: "#ffff00",
-  //       fillOpacity: 1,
-  //       strokeWeight: 5,
-  //       clickable: false,
-  //       editable: true,
-  //       zIndex: 1,
-  //     },
+      const drawingManager = new google.maps.drawing.DrawingManager({
+        drawingMode: google.maps.drawing.OverlayType.POLYGON,
+        drawingControl: false,
+        polygonOptions: {
+          strokeWeight: 0,
+          fillColor: "#1E90FF",
+          fillOpacity: 0.45,
+          editable: true
+        },
+        map: map
+      });
 
-  //     // rectangleOptions: polyOptions,
-  //     // circleOptions: polyOptions,
-  //     // polygonOptions: polyOptions,
-  //     // map: map
-  //   });
-  //   // console.log(window.google);
-  // }, [google]);
+      setState(oldState => ({
+        ...oldState,
+        google,
+        map,
+        drawingManager
+      }))
+    });
+  }, []);
+
+  useEffect(() => {
+    const { google, drawingManager, selectedShape } = state;
+
+    if (!google || !drawingManager) {
+      return;
+    }
+
+    let handleOverlayComplete: google.maps.MapsEventListener;
+
+    if (selectedShape) {
+      drawingManager.setDrawingMode(null);
+    } else {
+      drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+
+      handleOverlayComplete = google.maps.event.addListener(drawingManager, 'overlaycomplete', (e) => {
+        drawingManager.setDrawingMode(null);
+
+        const selectedShape: google.maps.Polygon = e.overlay;
+        const selectedShapePath = selectedShape.getPath();
+
+        const handlePathSetAndInsertAt = () => {
+          const area = google.maps.geometry.spherical.computeArea(selectedShape.getPath());
+          const rawPath = selectedShapePath.getArray();
+          const path = rawPath.map((latLng) => latLngToVector2Relative(latLng, rawPath[0]));
+
+          onChange({
+            area,
+            path
+          });
+        }
+
+        google.maps.event.addListener(selectedShapePath, 'set_at', handlePathSetAndInsertAt);
+        google.maps.event.addListener(selectedShapePath, 'insert_at', handlePathSetAndInsertAt);
+
+        handlePathSetAndInsertAt();
+
+        setState(oldState => ({
+          ...oldState,
+          selectedShape
+        }));
+      });
+    }
+
+    return () => {
+      google.maps.event.removeListener(handleOverlayComplete);
+    }
+  }, [state]);
+
+  useEffect(() => {
+    const { map } = state;
+
+    if (!map) {
+      return;
+    }
+
+    map.setCenter(center);
+    map.setZoom(18);
+  }, [center])
+
+  const handleDelete = () => {
+    if (state.selectedShape) {
+      state.selectedShape.setMap(null);
+
+      onChange(null);
+
+      setState(oldState => ({
+        ...oldState,
+        selectedShape: undefined
+      }))
+    }
+  }
 
   return (
-    <div className="map">
-      <GoogleMap
-        options={{
-          disableDefaultUI: true,
-          mapTypeId: "satellite",
-        }}
+    <Box height="100%" position="relative" display="flex" >
+      <Box flex="1 1 auto" ref={elRef} className="map__content" />
 
-        bootstrapURLKeys={{
-          key: GOOGLE_API_KEY,
-          language: 'ru',
-          region: 'ru',
-          libraries: ["drawing"]
-        }}
-        center={position}
-        zoom={zoom}
-        yesIWantToUseGoogleMapApiInternals
-        onGoogleApiLoaded={handleGoogleApiLoaded}
+      {children}
+
+      <Box
+        width="100%"
+        bottom={0}
+        display="flex"
+        justifyContent="center"
+        marginBottom={4}
+        position="absolute"
       >
-        <Marker {...position} />
-      </GoogleMap>
-    </div>
+        {
+          state.selectedShape && <Button
+            onClick={handleDelete}
+            variant="contained"
+          >
+            Очисть область
+          </Button>
+        }
+      </Box>
+    </Box>
   )
 }
 

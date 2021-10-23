@@ -2,15 +2,19 @@ import { Box } from '@mui/system'
 import React, { ReactNode } from 'react'
 
 interface Props {
-  children: ReactNode
+  children: ReactNode;
+  vertical?: boolean;
+  gap?: number | string;
 }
 
-const PanelGroup = ({ children }: Props) => {
+const PanelGroup = ({ children, vertical, gap }: Props) => {
   return (
     <Box
+      width="100%"
+      flexDirection={vertical ? "column" : "row"}
       display="flex"
       height="100%"
-      gap={6}
+      gap={gap}
     >
       {children}
     </Box>
