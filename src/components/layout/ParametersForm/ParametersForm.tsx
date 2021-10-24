@@ -1,6 +1,4 @@
-import { Divider, FormControl, FormGroup, FormLabel, Grid, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, Stack, TextField, Typography } from '@mui/material';
-import { Box } from '@mui/system'
-import { clamp } from 'lodash';
+import { Box, Divider, FormControl, FormGroup, FormLabel, Grid, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, Stack, TextField, Typography } from '@mui/material';
 import React, { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form';
 
@@ -67,7 +65,6 @@ const ParametersForm = ({ onChange }: ParametersFormProps) => {
           <FormLabel sx={{ marginBottom: 3 }} component="legend">Крыша</FormLabel>
           <Box
             display="flex"
-
             gap={2}
           >
             <FormControl fullWidth>
