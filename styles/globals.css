@@ -6,8 +6,109 @@
   box-sizing: border-box;
 }
 
+/* disable google maps copyright */
+.gm-style > div:nth-child(15),
+.gm-style > div:nth-child(17) {
+  display: none;
+}
+
+.sidebar-left,
+.sidebar-right {
+  visibility: visible;
+  opacity: 0;
+}
+
+.sidebar-left.enter {
+  opacity: 0;
+  transform: translate3d(-50px, 0, 0);
+}
+
+.sidebar-left.enter-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: all 0.6s;
+}
+
+.sidebar-left.enter-done {
+  opacity: 1;
+}
+
+.sidebar-left.exit {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.sidebar-left.exit-active {
+  opacity: 0;
+  transition: all 0.6s;
+  transform: translate3d(-50px, 0, 0);
+}
+.sidebar-left.exit-done {
+  opacity: 0;
+}
+
+.sidebar-right.enter {
+  opacity: 0;
+  transform: translate3d(50px, 0, 0);
+}
+
+.sidebar-right.enter-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: all 0.6s;
+}
+
+.sidebar-right.enter-done {
+  opacity: 1;
+}
+
+.sidebar-right.exit {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.sidebar-right.exit-active {
+  opacity: 0;
+  transition: all 0.6s;
+  transform: translate3d(50px, 0, 0);
+}
+.sidebar-right.exit-done {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .panel {
-  width: 100%;
-  transition: all 0.4s;
-  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 40px 0 rgba(0, 0, 0, 0.15);
+}
+
+.panel::after {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.map__delete-area-button.enter {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+}
+
+.map__delete-area-button.enter-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: all 0.6s;
+}
+
+.map__delete-area-button.enter-done {
+  opacity: 1;
+}
+
+.map__delete-area-button.exit {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.map__delete-area-button.exit-active {
+  opacity: 0;
+  transition: all 0.6s;
+  transform: translate3d(0, -30px, 0);
+}
+.map__delete-area-button.exit-done {
+  opacity: 0;
 }

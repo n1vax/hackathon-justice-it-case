@@ -1,94 +1,76 @@
 import React, { ReactNode, Suspense, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber'
+import { OrbitControls, useCubeTexture, useTexture } from '@react-three/drei'
 import { Mesh, Vector2, Shape, ExtrudeGeometry, Color, Vector3 } from 'three';
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import SolarPanel from '../SolarPanel';
+import HouseWalls from './HouseWalls';
+import { CircularProgress } from '@material-ui/core';
 
-// Extend will make OrbitControls available as a JSX element called orbitControls for us to use.
-extend({ OrbitControls });
 
 interface HouseSceneProps {
   path: Vector2[],
   height?: number;
 }
 
-const CameraControls = () => {
-  // Get a reference to the Three.js Camera, and the canvas html element.
-  // We need these to setup the OrbitControls component.
-  // https://threejs.org/docs/#examples/en/controls/OrbitControls
-  const {
-    camera,
-    gl: { domElement },
-  } = useThree();
-  // Ref to the controls, so that we can update them on every frame using useFrame
-  const controls = useRef();
-  // @ts-ignore
-  useFrame((state) => controls.current!.update());
 
-  // @ts-ignore
-  return <orbitControls ref={controls} args={[camera, domElement]} />;
-};
+const SkyBox = () => {
+  const { scene } = useThree();
+  // const texture = useCubeTexture([
+  //   "bay_bk.jpg",
+  //   "bay_ft.jpg",
+  //   "bay_up.jpg",
+  //   "bay_dn.jpg",
+  //   "bay_lf.jpg",
+  //   "bay_rt.jpg",
+  // ], {
+  //   path: "/assets/textures/skybox/"
+  // });
+
+  // scene.background = new Color("#fff");
+
+  return null;
+}
 
 const HouseScene = ({ path, height = 10 }: HouseSceneProps) => {
-  const geometry = React.useMemo(() => {
-    if (!path || path.length === 0) {
-      return null;
-    }
-
-    const shape = new Shape()
-
-    shape.moveTo(path[0].x, path[0].y);
-
-    for (let i = 1; i < path.length; ++i) {
-      const { x, y } = path[i];
-
-      shape.lineTo(x, y);
-    }
-
-    const _geometry = new ExtrudeGeometry(shape, {
-      depth: height,
-      bevelEnabled: false,
-    });
-
-    const rad90Deg = Math.PI / 2;
-
-    _geometry.rotateY(Math.PI);
-    _geometry.rotateZ(rad90Deg);
-    _geometry.rotateX(rad90Deg);
-
-    const { min, max } = _geometry.center().boundingBox!;
-    const { x, z } = min.add(max);
-    const y = height / 2;
-
-    _geometry.translate(x, y, z);
-
-    return _geometry;
-  }, [path]);
-
-  const cameraPosition = useMemo(() => {
-    const xy = path.reduce((acc, cur) => {
+  const maxPathItemLength = useMemo(() => {
+    return path.reduce((acc, cur) => {
       const length = cur.length();
 
       return length > acc ? length : acc
     }, 0);
+  }, [path]);
 
-    return new Vector3(xy, xy, 0);
-  }, []);
+  const position = useMemo(() => {
+    return new Vector3(maxPathItemLength, maxPathItemLength, 0);
+  }, [maxPathItemLength]);
+
+  // const solarPanels = useMemo(() => {
+  //   return Array.from({ length: 10 }, (_, i) => {
+  //     const position = new Vector3((i - 5) * 1 + 0.2, height, 0);
+
+  //     return <SolarPanel key={i} translate={position} width={1} height={1.65} />
+  //   });
+  // }, []);
 
   return (
-    <Canvas camera={{
-      position: cameraPosition,
-    }}>
-      <pointLight position={[-cameraPosition.x, 0, 0]} color="#fff" intensity={1.5} />
-      <pointLight position={cameraPosition} color="#fff" intensity={1.5} />
-      <ambientLight position={[0, cameraPosition.y, 0]} intensity={0.8} />
+    <Canvas camera={{ position }}>
+      <Suspense fallback={null}>
+        <pointLight position={[-maxPathItemLength, 0, 0]} color="#fff" intensity={1.5} />
+        <pointLight position={position} color="#fff" intensity={1.5} />
+        <ambientLight position={[0, maxPathItemLength, 0]} intensity={0.8} />
 
-      {geometry && <mesh geometry={geometry}>
-        <meshStandardMaterial attach="material" color="#888" />
-      </mesh>}
+        {path && <HouseWalls path={path} />}
 
-      <axesHelper scale={20} />
+        {/* <group>
+          {solarPanels}
+        </group> */}
 
-      <CameraControls />
+        <axesHelper scale={maxPathItemLength} />
+
+        <SkyBox />
+        <OrbitControls />
+      </Suspense>
     </Canvas>
   )
 }

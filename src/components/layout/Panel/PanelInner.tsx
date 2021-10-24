@@ -5,22 +5,18 @@ import { BoxProps, Paper } from '@mui/material';
 import { styled } from '@mui/system';
 import classNames from "classnames";
 
-interface PanelProps {
+interface PanelInnerProps {
   children: ReactNode;
-  height?: string
 }
 
-const Panel = ({ children, height = "100%" }: PanelProps) => {
+const PanelInner = ({ children }: PanelInnerProps) => {
   return (
     <Box
-      className="panel"
       sx={{
-        zIndex: 1,
-        position: "relative",
-        bgcolor: grey[200],
-        borderRadius: 2,
-        overflow: "hidden",
-        height
+        height: "100%",
+        px: 3,
+        py: 4,
+        overflow: "auto"
       }}
     >
       {children}
@@ -28,4 +24,4 @@ const Panel = ({ children, height = "100%" }: PanelProps) => {
   )
 }
 
-export default Panel
+export default PanelInner

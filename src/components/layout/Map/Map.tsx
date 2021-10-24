@@ -11,7 +11,7 @@ import { latLngToVector2Relative, latLngToVector3Relative } from "@utils/three";
 import { Backdrop, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { useForm } from "react-hook-form";
-
+import { CSSTransition } from "react-transition-group";
 
 
 interface MapProps {
@@ -33,6 +33,7 @@ const Map = ({
     drawingManager?: google.maps.drawing.DrawingManager,
     selectedShape?: google.maps.Polygon
   }>({});
+  const deleteBtnElRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const loader = new Loader({
@@ -44,10 +45,10 @@ const Map = ({
 
     loader.load().then((google) => {
       const map = new google.maps.Map(el, {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 20,
+        center,
+        zoom: 18,
         disableDefaultUI: true,
-        mapTypeId: "satellite"
+        mapTypeId: "hybrid"
       });
 
       const drawingManager = new google.maps.drawing.DrawingManager({
@@ -56,7 +57,7 @@ const Map = ({
         polygonOptions: {
           strokeWeight: 0,
           fillColor: "#1E90FF",
-          fillOpacity: 0.45,
+          fillOpacity: 0.6,
           editable: true
         },
         map: map
@@ -92,7 +93,7 @@ const Map = ({
         const selectedShapePath = selectedShape.getPath();
 
         const handlePathSetAndInsertAt = () => {
-          const area = google.maps.geometry.spherical.computeArea(selectedShape.getPath());
+          const area = +google.maps.geometry.spherical.computeArea(selectedShape.getPath()).toFixed(6);
           const rawPath = selectedShapePath.getArray();
           const path = rawPath.map((latLng) => latLngToVector2Relative(latLng, rawPath[0]));
 
@@ -144,10 +145,26 @@ const Map = ({
   }
 
   return (
-    <Box height="100%" position="relative" display="flex" >
+    <Box sx={{
+      position: "absolute",
+      top: 0,
+      display: "flex",
+      width: "100%",
+      height: "100%"
+    }}>
       <Box flex="1 1 auto" ref={elRef} className="map__content" />
 
       {children}
+      <Box sx={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.2)",
+        pointerEvents: "none"
+      }}
+      />
 
       <Box
         width="100%"
@@ -157,14 +174,17 @@ const Map = ({
         marginBottom={4}
         position="absolute"
       >
-        {
-          state.selectedShape && <Button
+        <CSSTransition mountOnEnter in={!!state.selectedShape} timeout={600} nodeRef={deleteBtnElRef}>
+          <Button
+            className="map__delete-area-button"
+            ref={deleteBtnElRef}
+            color="primary"
             onClick={handleDelete}
             variant="contained"
           >
-            Очисть область
+            Удалить выделенную область
           </Button>
-        }
+        </CSSTransition>
       </Box>
     </Box>
   )
