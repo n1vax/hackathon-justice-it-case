@@ -1,7 +1,7 @@
-import { Box } from "@mui/system";
 import classNames from "classnames";
 import { ReactNode, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
+import { Box } from "@mui/material";
 
 interface SidebarProps {
   children: ReactNode;
@@ -18,6 +18,7 @@ const Sidebar = ({ children, show, className }: SidebarProps) => {
       nodeRef={elRef}
       in={show}>
       <Box
+        component="div"
         className={classNames("sidebar", className)}
         ref={elRef}
         sx={{

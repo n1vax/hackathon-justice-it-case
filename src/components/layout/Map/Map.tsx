@@ -1,13 +1,11 @@
 import GoogleMap from "google-map-react"
 // import { GoogleMap, withGoogleMap } from "react-google-maps";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { Mesh, Scene, BoxBufferGeometry, MeshNormalMaterial, Vector2 } from "three";
-import { latLngToVector3, ThreeJSOverlayView } from "@googlemaps/three";
-import { useGoogle } from "src/contexts/Google";
+import * as THREE from "three";
 import { GOOGLE_API_KEY } from '@utils/config';
 import { Loader } from '@googlemaps/js-api-loader';
 import Button from '@mui/material/Button';
-import { latLngToVector2Relative, latLngToVector3Relative } from "@utils/three";
+import { latLngToVector2Relative } from "@utils/three";
 import { Backdrop, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { useForm } from "react-hook-form";
@@ -18,7 +16,7 @@ interface MapProps {
   children?: ReactNode;
   center: GoogleMap.Coords;
   zoom?: number;
-  onChange: (data: { area: number, path: Vector2[] } | null) => void;
+  onChange: (data: { area: number, path: THREE.Vector2[] } | null) => void;
 }
 
 const Map = ({
@@ -145,17 +143,19 @@ const Map = ({
   }
 
   return (
-    <Box sx={{
-      position: "absolute",
-      top: 0,
-      display: "flex",
-      width: "100%",
-      height: "100%"
-    }}>
-      <Box flex="1 1 auto" ref={elRef} className="map__content" />
+    <Box
+      component="div"
+      sx={{
+        position: "absolute",
+        top: 0,
+        display: "flex",
+        width: "100%",
+        height: "100%"
+      }}>
+      <Box component="div" flex="1 1 auto" ref={elRef} className="map__content" />
 
       {children}
-      <Box sx={{
+      <Box component="div" sx={{
         position: "absolute",
         top: 0,
         left: 0,
@@ -167,6 +167,7 @@ const Map = ({
       />
 
       <Box
+        component="div"
         width="100%"
         bottom={0}
         display="flex"

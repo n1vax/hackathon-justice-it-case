@@ -1,9 +1,6 @@
-import { Box } from '@mui/system'
 import React, { ReactNode } from 'react'
-import { grey } from '@mui/material/colors';
-import { BoxProps, Paper } from '@mui/material';
-import { styled } from '@mui/system';
-import classNames from "classnames";
+import { Box } from '@mui/material';
+
 
 interface PanelInnerProps {
   children: ReactNode;
@@ -12,6 +9,7 @@ interface PanelInnerProps {
 const PanelInner = ({ children }: PanelInnerProps) => {
   return (
     <Box
+      component="div"
       sx={{
         height: "100%",
         px: 3,

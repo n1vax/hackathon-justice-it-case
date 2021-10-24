@@ -1,9 +1,7 @@
 import { useMemo, useState } from "react";
-import { Vector2 } from "three";
+import * as THREE from "three";
 import { useForm } from "react-hook-form";
-import { Box } from "@mui/system";
-import Paper from '@mui/material/Paper';
-import { Divider, Grid, IconButton, InputBase, List, ListItem, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Grid, IconButton, InputBase, List, ListItem, Typography, Box } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
 
 import Map from "@components/layout/Map";
@@ -35,7 +33,7 @@ const App = (props: AppProps) => {
   });
 
   const [data, setData] = useState<{
-    path: Vector2[],
+    path: THREE.Vector2[],
     area: number
   } | null>(null);
 
@@ -131,6 +129,7 @@ const App = (props: AppProps) => {
 
   return (
     <Box
+      component="div"
       sx={{
         overflow: "hidden",
         position: "relative",

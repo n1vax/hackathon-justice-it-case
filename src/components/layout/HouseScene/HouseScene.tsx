@@ -1,11 +1,10 @@
 import React, { ReactNode, Suspense, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber'
 import { OrbitControls, useCubeTexture, useTexture } from '@react-three/drei'
-import { Mesh, Vector2, Shape, ExtrudeGeometry, Color, Vector3 } from 'three';
+import { Vector2, Vector3 } from 'three';
 // import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import SolarPanel from '../SolarPanel';
 import HouseWalls from './HouseWalls';
-import { CircularProgress } from '@material-ui/core';
 
 
 interface HouseSceneProps {
