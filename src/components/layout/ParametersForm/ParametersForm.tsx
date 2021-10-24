@@ -64,6 +64,7 @@ const ParametersForm = ({ onChange }: ParametersFormProps) => {
         <FormControl component="fieldset" variant="standard" fullWidth>
           <FormLabel sx={{ marginBottom: 3 }} component="legend">Крыша</FormLabel>
           <Box
+            component="div"
             display="flex"
             gap={2}
           >
@@ -160,7 +161,9 @@ const ParametersForm = ({ onChange }: ParametersFormProps) => {
 
         <FormControl component="fieldset" variant="standard" fullWidth>
           <FormLabel sx={{ marginBottom: 3 }} component="legend">Исходные параметры</FormLabel>
-          <Box flexDirection="column" display="flex" gap={2}>
+          <Box
+            component="div"
+            flexDirection="column" display="flex" gap={2}>
             <FormControl fullWidth>
               <InputLabel>Затраты на электричество в год</InputLabel>
               <OutlinedInput
